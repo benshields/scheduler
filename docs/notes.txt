@@ -1,0 +1,43 @@
+Simple Job Worker - code challenge for Systems Engineer at Gravitational
+
+Security
+- use TLS to encrypt (Mutual TLS?)
+	- keep sensitive data out of requests & cache
+	- only support strong protocols / ciphers
+		- OWASP maintains best practices:
+			https://www.owasp.org/index.php/Transport_Layer_Protection_Cheat_Sheet
+	- is SSL rating applicable?
+		https://www.ssllabs.com/ssltest
+- DOS mitigation
+	- whitelist only legitimate IP addresses?
+	- rate limiting
+		- give users strict limits on concurrent requests and total requests over a given duration
+	- at production:
+		- would use caching, performance testing, and perhaps upstream filtering and DDS to 3rd parties
+	- Ask team!
+		- should I implement any DOS mitigation?
+- sanitizing data
+	- input, display, uploading, any data crossing trust boundaries counts
+	- common techniques:
+		- accept known good, reject bad, sanitize
+	- OWASP  maintains examples
+	- use existing frameworks
+	- look at CVEs
+	- trust no one
+- managing API credentials
+	- pull secrets from environment variables?
+	- write your API to act as an OAuth 2.0 "Resource Server"
+	- use JSON Web Tokens (JWT) as the tokens
+	- use the token as a Bearer token with the Authorization header to prevent leaking your token in logs and caches
+	- at production:
+		- implement regular token rotation
+		- monitor my source code for token leaks
+		- implement "channel binding" to tie API tokens to the TLS session they are requested over
+	- Ask team!
+		- is OAuth 2.0 with JWT overkill? If so, how about ___?
+- RBAC
+	- have a toy authorization service?
+		- it would have a secure, encrypted database, but I'll use a tab separated file
+		- auth service admin can create launchers or monitors
+			- both can check status & receive output
+			- only launcher can start & stop
